@@ -173,7 +173,7 @@ clock_t ClockCreate(uint32_t ticks_por_segundos) {
     static struct clock_s self[1];
     memset(self, 0, sizeof(self));
     // self->tick_x_sec = ticks_por_segundos;
-    self->tick_x_sec = 50;
+    self->tick_x_sec = 25;
     return self;
 }
 

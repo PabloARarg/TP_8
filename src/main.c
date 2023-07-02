@@ -61,6 +61,8 @@ static placa_t board;
 
 static clock_t reloj;
 
+static uint16_t sist_contador;
+
 /* === Private function declarations =========================================================== */
 
 /* === Public variable definitions ============================================================= */
@@ -116,6 +118,10 @@ int main(void) {
 
     reloj = ClockCreate(TICK_POR_SEC);
 
+    sist_contador = 0;
+
+    DisplayFlashDigit(board->display, 0, 3, 250);
+
     uint8_t hora[6];
 
 #ifdef TICK
@@ -150,11 +156,6 @@ int main(void) {
 #ifndef TICK
         DisplayRefresh(board->display);
 #endif
-
-        for (int index = 0; index < 100; index++) {
-            __asm("NOP");
-        }
-
         ClockGetTime(reloj, hora, sizeof(hora));
         __asm volatile("cpsid i");
         DisplayWriteBCD(board->display, hora, sizeof(hora));
@@ -163,6 +164,12 @@ int main(void) {
 }
 
 void SysTick_Handler(void) {
+    sist_contador = ((sist_contador + 1) % (TICK_POR_SEC));
+    // Punto parpadenate
+    if (sist_contador < TICK_POR_SEC / 2) {
+        DisplayPunto(board->display, 1);
+    }
+
     DisplayRefresh(board->display);
     AumentarTick(reloj);
     ActualizarHora(reloj);

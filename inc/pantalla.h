@@ -105,6 +105,14 @@ void DisplayRefresh(display_t display);
  */
 void DisplayFlashDigit(display_t display, uint8_t desde, uint8_t hasta, uint16_t frecuencia);
 
+/**
+ * @brief Funcion para hacer parpadera los puntos
+ *
+ * @param display Puntero a la pantalla
+ * @param posicion Posicion del punto
+ */
+void DisplayPunto(display_t display, uint8_t posicion);
+
 /* === Public function declarations ============================================================ */
 
 /* === End of documentation ==================================================================== */

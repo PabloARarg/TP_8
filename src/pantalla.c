@@ -144,6 +144,11 @@ void DisplayFlashDigit(display_t display, uint8_t desde, uint8_t hasta, uint16_t
     display->flashing_desde = desde;
     display->flashing_hasta = hasta;
 }
+
+void DisplayPunto(display_t display, uint8_t posicion) {
+    display->memory[posicion] ^= (1 << 7);
+}
+
 /* === End of documentation ==================================================================== */
 
 /** @} End of module definition for doxygen */
