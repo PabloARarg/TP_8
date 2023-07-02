@@ -45,6 +45,11 @@ struct display_s {
     uint8_t active_digit;
     uint8_t memory[DISPLAY_MAX_DIGITS];
     struct display_driver_s driver[1];
+
+    uint8_t flashing_desde;
+    uint8_t flashing_hasta;
+    uint16_t flashing_frecuencia;
+    uint16_t flashing_contador;
 };
 
 /* === Private variable declarations =========================================================== */
@@ -87,8 +92,13 @@ display_t DisplayCreate(uint8_t digits, display_driver_t driver) {
     if (display) {
         display->digits = digits;
         display->active_digit = digits - 1;
+
+        display->flashing_desde = 0;
+        display->flashing_hasta = 0;
+        display->flashing_frecuencia = 0;
+        display->flashing_contador = 0;
+
         memcpy(display->driver, driver, sizeof(display->driver));
-        // memset(display->memory, 0, sizeof(display->memory));
         BORRAR_MEMORIA_VIDEO;
         display->driver->ScreenTurnOff();
     }
@@ -106,10 +116,33 @@ void DisplayWriteBCD(display_t display, uint8_t * number, uint8_t size) {
 }
 
 void DisplayRefresh(display_t display) {
+
+    uint8_t segments;
+
     display->driver->ScreenTurnOff();
     display->active_digit = (display->active_digit + 1) % display->digits;
-    display->driver->SegmentsTurnOn(display->memory[display->active_digit]);
+
+    segments = display->memory[display->active_digit];
+    if (display->flashing_frecuencia) {
+        if (display->active_digit == 0) {
+            display->flashing_contador = (display->flashing_contador + 1) % display->flashing_frecuencia;
+        }
+        if ((display->active_digit >= display->flashing_desde) && (display->active_digit <= display->flashing_hasta)) {
+            if (display->flashing_contador > (display->flashing_frecuencia / 2)) {
+                segments = 0;
+            }
+        }
+    }
+
+    display->driver->SegmentsTurnOn(segments);
     display->driver->DigitTurnOn(display->active_digit);
+}
+
+void DisplayFlashDigit(display_t display, uint8_t desde, uint8_t hasta, uint16_t frecuencia) {
+    display->flashing_contador = 0;
+    display->flashing_frecuencia = frecuencia;
+    display->flashing_desde = desde;
+    display->flashing_hasta = hasta;
 }
 /* === End of documentation ==================================================================== */
 

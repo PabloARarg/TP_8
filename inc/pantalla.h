@@ -95,6 +95,16 @@ void DisplayWriteBCD(display_t display, uint8_t * number, uint8_t size);
  */
 void DisplayRefresh(display_t display);
 
+/**
+ * @brief Funcion para hacer parpadear los digitos cosecutivos
+ *
+ * @param display Puntero a la pantalla
+ * @param desde Posicion del primer digito a parpadear
+ * @param hasta Posicion del ultimo digito a parpadera
+ * @param frecuencia Factor divisor de frecuencia del parpadeo
+ */
+void DisplayFlashDigit(display_t display, uint8_t desde, uint8_t hasta, uint16_t frecuencia);
+
 /* === Public function declarations ============================================================ */
 
 /* === End of documentation ==================================================================== */
