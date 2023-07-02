@@ -71,7 +71,10 @@ typedef struct placa_s {
     digital_input_t set_alarm;
 
     display_t display;
-} const * const placa_t;
+} placa_s;
+
+typedef struct placa_s * placa_t;
+
 #endif
 /* === Public variable declarations ============================================================ */
 

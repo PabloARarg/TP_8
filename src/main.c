@@ -45,13 +45,21 @@
 #include "define.h"
 #include "digital.h"
 #include "pantalla.h"
+#include "reloj.h"
 #include <stdbool.h>
 
 /* === Macros definitions ====================================================================== */
+#ifndef TICK_POR_SEC
+#define TICK_POR_SEC 1000
+#endif
 
 /* === Private data type declarations ========================================================== */
 
 /* === Private variable declarations =========================================================== */
+
+static placa_t board;
+
+static clock_t reloj;
 
 /* === Private function declarations =========================================================== */
 
@@ -104,14 +112,18 @@ int main(void) {
 
 #ifdef PONCHO
 int main(void) {
-    placa_t board = BoardCreate();
+    board = BoardCreate();
+
+    reloj = ClockCreate(TICK_POR_SEC);
+
+    uint8_t hora[6];
 
 #ifdef TICK
-    SisTick_Init(1000);
+    SisTick_Init(TICK_POR_SEC);
 #endif
 
     while (true) {
-        if (DigitalInputHasActivate(board->acept)) {
+        /* if (DigitalInputHasActivate(board->acept)) {
             DisplayWriteBCD(board->display, (uint8_t[]){1, 2, 3, 4}, 4);
         }
 
@@ -133,7 +145,7 @@ int main(void) {
 
         if (DigitalInputHasActivate(board->increment)) {
             DisplayWriteBCD(board->display, (uint8_t[]){9, 9, 9, 9}, 4);
-        }
+        } */
 
 #ifndef TICK
         DisplayRefresh(board->display);
@@ -142,8 +154,20 @@ int main(void) {
         for (int index = 0; index < 100; index++) {
             __asm("NOP");
         }
+
+        ClockGetTime(reloj, hora, sizeof(hora));
+        __asm volatile("cpsid i");
+        DisplayWriteBCD(board->display, hora, sizeof(hora));
+        __asm volatile("cpsie i");
     }
 }
+
+void SysTick_Handler(void) {
+    DisplayRefresh(board->display);
+    AumentarTick(reloj);
+    ActualizarHora(reloj);
+}
+
 #endif
 /* === End of documentation ==================================================================== */
 

@@ -56,8 +56,8 @@ extern "C" {
 //! Define el numero de salidas digitales (por defecto es 4)
 #define OUTPUT_INSTANCES 4
 
-//! Si se define la cantidad de tiks por segundos a utilizar
-#define TICK_POR_SEC 5
+//! Si se define la cantidad de tiks por segundos a utilizar --> 1000 es por defecto
+#define TICK_POR_SEC 1000
 
 //! Define la cantidad de veces por segundo que se llamará a la función para mantener la hora actualizada.
 #define CANT_REFRESCO 60

@@ -169,7 +169,7 @@ void SegmentsTurnOn(uint8_t segments) {
 }
 
 void DigitTurnOn(uint8_t digit) {
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << (digit)) & DIGITS_MASK);
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << (3 - digit)) & DIGITS_MASK);
 }
 
 #endif
@@ -252,9 +252,6 @@ void SisTick_Init(uint16_t ticks) {
     __asm volatile("cpsie i");
 }
 
-void SysTick_Handler(void) {
-    DisplayRefresh(board.display);
-}
 #endif
 
 /* === End of documentation ==================================================================== */
