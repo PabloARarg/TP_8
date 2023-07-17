@@ -46,52 +46,126 @@ extern "C" {
 typedef struct clock_s * clock_t;
 
 /* === Public variable declarations ============================================================ */
-void SetTicks(clock_t reloj);
-void AumentarTick(clock_t reloj);
 
 /* === Public function declarations ============================================================ */
 
-//! Auementa el contador interno del reloj en 1
+/**
+ * @brief Auementa el contador interno del reloj en 1
+ *
+ * @param reloj puntero que referencia al reloj
+ */
 void AumentarTick(clock_t reloj);
 
-//! Crea el reloj
+/**
+ * @brief Funcion que crea el reloj
+ *
+ * @param ticks_por_segundos cantidad de ticks por segundos para el cambio del contador interno
+ * @return clock_t debuelve el puntero referencia al reloj
+ */
 clock_t ClockCreate(uint32_t ticks_por_segundos);
 
-// • La librería deberá proporcionar una función para ajustar la hora actual.
-//! Copia el contenido de *hora en reloj->hora_actual y en el campo validad=actual
+/**
+ * @brief función para ajustar la hora actual.
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param hora vector de 6 entero --> (puntero)
+ * @param size Tamaño del vector en bytes
+ * @return true cuando se guardo correctamente,
+ * @return false cuando no se pudo guardar
+ * @note Copia el contenido de "hora" en el reloj campo->hora_actual y cambia campo->valida a "true"
+ */
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size);
 
-//! Obteine la hora
+/**
+ * @brief Funcion que obteine la hora
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param hora vector de 6 entero --> (puntero)
+ * @param size Tamaño del vector en bytes
+ * @return true cuando se obtuvo correctamente,
+ * @return false cuando no se pudo obtener
+ * @note Copia el contenido del reloj campo->hora_actual en "hora"
+ */
 bool ClockGetTime(clock_t reloj, uint8_t * hora, uint32_t size);
 
-//! Actualiza la hora(refresca la hora en funcion al contador de interno del reloj)
+/**
+ * @brief Actualiza la hora
+ *
+ * @param reloj puntero que referencia al reloj
+ * @note Actializa la hora interna del reloj si la cantidad de ticks se alcanzaron para que cambie 1 seg
+ */
 void ActualizarHora(clock_t reloj);
 
-// • La librería deberá proporcionar una función para fijar la hora de la alarma.
+/**
+ * @brief función para fijar la hora de la alarma.
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param hora vector de 6 entero --> (puntero)
+ * @param size Tamaño del vector en bytes
+ * @return true Tamaño del vector en bytes
+ * @return false cuando no se pudo guardar
+ * @note Copia el contenido de "hora" en el reloj campo->alarma y cambia campo->alarma_on a "true"
+ */
 bool ClockSetAlarm(clock_t reloj, const uint8_t * hora, uint32_t size);
 
-// • La librería deberá proporcionar una función para consultar la hora fijada para la alarma.
+/**
+ * @brief función para consultar la hora fijada para la alarma.
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param hora vector de 6 entero --> (puntero)
+ * @param size Tamaño del vector en bytes
+ * @return true si la alarma esta configurada para sonar,
+ * @return false si no esta configurada
+ * @note copia el campo->alarma a "hora"
+ */
 bool ClockGetAlarm(clock_t reloj, uint8_t * hora, uint32_t size);
 
-// • La librería deberá proporcionar una función para habilitar y deshabilitar la alarma.
+/**
+ * @brief función para habilitar y deshabilitar la alarma.
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param estado_requerido estado que se requiere la alarma
+ * @return debuelve el estado de la alarma, parametro->alarma_on
+ */
 bool AlarmaOnOf(clock_t reloj, bool estado_requerido);
 
-// • La librería deberá proporcionar una función para consultar si la alarma está, o no, habilitada.
+/**
+ * @brief función para consultar si la alarma está, o no, habilitada.
+ *
+ * @param reloj puntero que referencia al reloj
+ * @return debuelve el estado de la alarma, parametro->alarma_on
+ */
 bool AlarmaGetState(clock_t reloj);
 
-// • La librería deberá proporcionar una función para posponer la alarma una cantidad arbitraria
-// de minutos.-> primero 5 minutos
+/**
+ * @brief función para posponer la alarma una cantidad arbitraria en minutos
+ *
+ * @param reloj puntero que referencia al reloj
+ * @param tiempo_muerto cantidad de minutos a posponer
+ * @return true si exite un valor para posponer el timepo,
+ * @return false si el valor es 0
+ */
 bool AlarmaRest(clock_t reloj, uint8_t tiempo_muerto);
 
-// Funcion hace sonar la alarma
+/**
+ * @brief Funcion hace sonar la alarma
+ *
+ * @param reloj puntero que referencia al reloj
+ * @return true si la alrama esta sonando,
+ * @return false si no lo esta
+ * @note compara la hora actual, la alarma y si esta activa, si se cumple activa el campo->alarma_activada y comprueba
+ * si no esta pospuesta para que debolver el valor el estado
+ */
 bool AlarmaActivar(clock_t reloj);
 
-// Funcion cancela pospone la alarma por un dia
+/**
+ * @brief Funcion cancela pospone la alarma por un dia
+ *
+ * @param reloj puntero que referencia al reloj
+ * @return debuelve el estado del campo->alarma_activada (indica si esta sonado)
+ */
 bool AlarmaPosponer(clock_t reloj);
 
-// • La librería deberá generar un evento cuando la alarma esté habilitada y además hora actual
-// coincida con la hora de la alarma.-> cuando cambia el minuto se fija si la alarma sonara -> la alarma tiene presicion
-// de minutos
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus

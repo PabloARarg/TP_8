@@ -62,7 +62,7 @@ extern "C" {
 
 //! Si se define la cantidad de tiks por cambio del segundos en el display
 //--> 1000 es por defecto igual que TICK_POR_SEC, usado para incrementar la velocidad del reloj en pruebas
-#define TICK_POR_CAMBIO_SEG 25
+#define TICK_POR_SEC_TEST 25
 
 //! Define la cantidad de minutos que se pospone la alarma
 #define TIME_OUT 5

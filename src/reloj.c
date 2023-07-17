@@ -62,11 +62,6 @@ struct clock_s {
 
 /* === Private variable declarations =========================================================== */
 
-void SetTicks(clock_t reloj) {
-    reloj->ticks_actual = reloj->tick_x_sec - 1;
-    return;
-}
-
 /* === Private function declarations =========================================================== */
 void ComprobarDecenaSegundos(uint8_t * hora, clock_t reloj);
 void ComprobarUnidadMinutos(uint8_t * hora, clock_t reloj);
@@ -172,7 +167,7 @@ void AumentarTick(clock_t reloj) {
 clock_t ClockCreate(uint32_t ticks_por_segundos) {
     static struct clock_s self[1];
     memset(self, 0, sizeof(self));
-    self->tick_x_sec = TICK_POR_CAMBIO_SEG;
+    self->tick_x_sec = ticks_por_segundos;
     return self;
 }
 
@@ -199,6 +194,7 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size) {
 void ActualizarHora(clock_t reloj) {
     uint8_t hora[6];
     bool aux;
+
     if (reloj->ticks_actual == reloj->tick_x_sec) {
         (void)ClockGetTime(reloj, hora, sizeof(hora));
         if (hora[5] < 9) {

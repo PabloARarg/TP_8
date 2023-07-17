@@ -1,8 +1,4 @@
-/* Copyright 2022, Laboratorio de Microprocesadores
- * Facultad de Ciencias Exactas y Tecnología
- * Universidad Nacional de Tucuman
- * http://www.microprocesadores.unt.edu.ar/
- * Copyright 2022, Esteban Volentini <evolentini@herrera.unt.edu.ar>
+/* 2023, Rivas Pablo
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -202,7 +198,7 @@ int main(void) {
 int main(void) {
     board = BoardCreate();
 
-    reloj = ClockCreate(TICK_POR_SEC);
+    reloj = ClockCreate(TICK_POR_SEC_TEST);
 
     sist_contador = 0;
     tres_sec = 0;
