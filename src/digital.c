@@ -32,14 +32,7 @@ SPDX-License-Identifier: MIT
 #include <stdint.h>
 
 /* === Macros definitions ====================================================================== */
-// define un parametro que determina el tamaño de la estructura de las salidas, si no esta definido antes
-#ifndef OUTPUT_INSTANCES
-#define OUTPUT_INSTANCES 4
-#endif
-// define un parametro para determinar el tamaño de la estructura de las entradas, si no esta difinido antes
-#ifndef INPUT_INSTANCES
-#define INPUT_INSTANCES 4
-#endif
+
 /* === Private data type declarations ========================================================== */
 
 //! Estructura para almacenar el descriptor de una salida digital

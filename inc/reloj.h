@@ -28,7 +28,7 @@ SPDX-License-Identifier: MIT
  ** @{ */
 
 /* === Headers files inclusions ================================================================ */
-//#include "define.h"
+#include "define.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -39,10 +39,6 @@ extern "C" {
 #endif
 
 /* === Public macros definitions =============================================================== */
-
-#ifndef CANT_REFRESCO
-#define CANT_REFRESCO 60
-#endif
 
 /* === Public data type declarations =========================================================== */
 

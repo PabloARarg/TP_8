@@ -169,7 +169,7 @@ void SegmentsTurnOn(uint8_t segments) {
 }
 
 void DigitTurnOn(uint8_t digit) {
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << (3 - digit)) & DIGITS_MASK);
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << ((OUTPUT_INSTANCES - 1) - digit)) & DIGITS_MASK);
 }
 
 #endif
@@ -229,11 +229,11 @@ placa_t BoardCreate(void) {
     BuzzerInit();
     KeysInit();
 
-    board.display = DisplayCreate(4, &(struct display_driver_s){
-                                         .ScreenTurnOff = ScreenTurnOff,
-                                         .SegmentsTurnOn = SegmentsTurnOn,
-                                         .DigitTurnOn = DigitTurnOn,
-                                     });
+    board.display = DisplayCreate(OUTPUT_INSTANCES, &(struct display_driver_s){
+                                                        .ScreenTurnOff = ScreenTurnOff,
+                                                        .SegmentsTurnOn = SegmentsTurnOn,
+                                                        .DigitTurnOn = DigitTurnOn,
+                                                    });
     return &board;
 }
 #endif

@@ -28,14 +28,9 @@ SPDX-License-Identifier: MIT
 /* === Headers files inclusions =============================================================== */
 
 #include "pantalla.h"
-#include "define.h"
 #include <string.h>
 
 /* === Macros definitions ====================================================================== */
-
-#ifndef DISPLAY_MAX_DIGITS
-#define DISPLAY_MAX_DIGITS 8
-#endif
 
 #define BORRAR_MEMORIA_VIDEO memset(display->memory, 0, sizeof(display->memory))
 /* === Private data type declarations ========================================================== */

@@ -29,6 +29,7 @@ SPDX-License-Identifier: MIT
  ** @{ */
 
 /* === Headers files inclusions ================================================================ */
+#include "define.h"
 #include <stdint.h>
 /* === Cabecera C++ ============================================================================ */
 
@@ -37,6 +38,10 @@ extern "C" {
 #endif
 
 /* === Public macros definitions =============================================================== */
+#ifndef DISPLAY_MAX_DIGITS
+#define DISPLAY_MAX_DIGITS 8
+#endif
+
 #define SEGMENTO_A (1 << 0)
 #define SEGMENTO_B (1 << 1)
 #define SEGMENTO_C (1 << 2)

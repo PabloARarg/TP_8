@@ -19,16 +19,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 SPDX-License-Identifier: MIT
 *************************************************************************************************/
 
-#ifndef DEFINE_H
-#define DEFINE_H
-
-/** \brief Archivo para crear solo definiciones para macros
- **
- ** \addtogroup
- ** \brief
- ** @{ */
+#ifndef INTERFACE_H
+#define INTERFACE_H
 
 /* === Headers files inclusions ================================================================ */
+#include "bcp.h"
+#include "chip.h"
+#include "define.h"
+#include "digital.h"
+#include "interface.h"
+#include "pantalla.h"
+#include "reloj.h"
+#include <stdbool.h>
+#include <string.h>
 
 /* === Cabecera C++ ============================================================================ */
 
@@ -37,35 +40,45 @@ extern "C" {
 #endif
 
 /* === Public macros definitions =============================================================== */
+#define VERIFICAR_OBTENER_HORA ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define DEFINIR_HORA ClockSetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define VERIFICAR_OBTENER_ALARMA ClockGetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define DEFINIR_ALARMA ClockSetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
 
-//! Si se define CIA se compila para la placa educia sin interface adicional
-//#define CIA
+/* === Public data type declarations =========================================================== */
+typedef enum {
+    SIN_CONFIGURAR,
+    MOSTRANDO_HORA,
+    ACTUAL_AJUSTANDO_MINUTOS,
+    ACTUAL_AJUSTANDO_HORAS,
+    ALARMA_AJUSTANDO_MINUTOS,
+    ALARMA_AJUSTANDO_HORAS,
+} modo_t;
 
-//! Si se define PONCHO se compila para para la placa adicional de interface (poncho)
-#define PONCHO
+/* === Public variable declarations ============================================================ */
 
-//! Si se define TICK se activa la funcion de systick
-#define TICK
+static placa_t board;
+static modo_t modo;
+static clock_t reloj;
+static uint8_t hora_obtenida[6];
+static uint8_t tres_sec;
+static uint8_t treinta_sec;
+static uint16_t sist_contador;
 
-//! Permite configurar la cantidad de digitos maximos
-#define DISPLAY_MAX_DIGITS 8
+/* === Public function declarations ============================================================ */
+void CambiarModo(modo_t valor);
 
-//! Define el numero de salidas digitales que se etan usando (por defecto es 4) --> digitos
-#define OUTPUT_INSTANCES 4
+void PuntoModo(modo_t modo);
 
-//! Define el numero de entradas digitales (por defecto es 4) --> botones
-#define INPUT_INSTANCES 6
+void GetHoraModo(modo_t modo);
 
-//! Si se define la cantidad de tiks por segundos a utilizar, principalmente para la interrupcion
-//--> 1000 es por defecto
-#define TICK_POR_SEC 1000
+void AumentarMinuto(uint8_t entrada[6]);
 
-//! Si se define la cantidad de tiks por cambio del segundos en el display
-//--> 1000 es por defecto igual que TICK_POR_SEC, usado para incrementar la velocidad del reloj en pruebas
-#define TICK_POR_CAMBIO_SEG 25
+void AumentarHora(uint8_t entrada[6]);
 
-//! Define la cantidad de minutos que se pospone la alarma
-#define TIME_OUT 5
+void DisminuirMinuto(uint8_t entrada[6]);
+
+void DisminuirHora(uint8_t entrada[6]);
 
 /* === End of documentation ==================================================================== */
 
@@ -75,4 +88,4 @@ extern "C" {
 
 /** @} End of module definition for doxygen */
 
-#endif /* DEFINE_H */
+#endif /* INTERFACE_H*/

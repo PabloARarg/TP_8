@@ -44,6 +44,7 @@
 #include "chip.h"
 #include "define.h"
 #include "digital.h"
+#include "interface.h"
 #include "pantalla.h"
 #include "reloj.h"
 #include <stdbool.h>
@@ -54,51 +55,11 @@
 #define TICK_POR_SEC 1000
 #endif
 
-#define VERIFICAR_OBTENER_HORA ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define DEFINIR_HORA ClockSetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define VERIFICAR_OBTENER_ALARMA ClockGetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define DEFINIR_ALARMA ClockSetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
 /* === Private data type declarations ========================================================== */
-typedef enum {
-    SIN_CONFIGURAR,
-    MOSTRANDO_HORA,
-    ACTUAL_AJUSTANDO_MINUTOS,
-    ACTUAL_AJUSTANDO_HORAS,
-    ALARMA_AJUSTANDO_MINUTOS,
-    ALARMA_AJUSTANDO_HORAS,
-} modo_t;
 
 /* === Private variable declarations =========================================================== */
 
-static placa_t board;
-
-static clock_t reloj;
-
-static uint16_t sist_contador;
-
-static modo_t modo;
-
-static uint8_t hora_obtenida[6];
-
-static uint8_t tres_sec;
-
-static uint8_t treinta_sec;
-
 /* === Private function declarations =========================================================== */
-
-void CambiarModo(modo_t valor);
-
-void PuntoModo(void);
-
-void GetHoraModo(void);
-
-void AumentarMinuto(uint8_t entrada[6]);
-
-void AumentarHora(uint8_t entrada[6]);
-
-void DisminuirMinuto(uint8_t entrada[6]);
-
-void DisminuirHora(uint8_t entrada[6]);
 
 /* === Public variable definitions ============================================================= */
 
@@ -131,7 +92,7 @@ void CambiarModo(modo_t valor) {
     }
 }
 
-void PuntoModo(void) {
+void PuntoModo(modo_t modo) {
     switch (modo) {
     case SIN_CONFIGURAR:
         DisplayPunto(board->display, 1);
@@ -171,7 +132,7 @@ void PuntoModo(void) {
     }
 }
 
-void GetHoraModo(void) {
+void GetHoraModo(modo_t modo) {
     switch (modo) {
     case SIN_CONFIGURAR:
         ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
@@ -180,86 +141,20 @@ void GetHoraModo(void) {
         ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
         break;
     case ACTUAL_AJUSTANDO_MINUTOS:
-        // ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
+
         break;
     case ACTUAL_AJUSTANDO_HORAS:
-        // ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
+
         break;
     case ALARMA_AJUSTANDO_MINUTOS:
-        // ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
+
         break;
     case ALARMA_AJUSTANDO_HORAS:
-        // ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
+
         break;
     default:
         break;
     }
-}
-
-void AumentarMinuto(uint8_t entrada[6]) {
-    if (entrada[3] < 9) {
-        entrada[3]++;
-    } else if (entrada[3] == 9) {
-        if (entrada[2] < 5) {
-            entrada[2]++;
-        } else if (entrada[2] == 5) {
-            entrada[2] = 0;
-        }
-        entrada[3] = 0;
-    }
-    return;
-}
-
-void AumentarHora(uint8_t entrada[6]) {
-    if (entrada[0] < 2) {
-        if (entrada[1] < 9) {
-            entrada[1]++;
-        } else if (entrada[1] == 9) {
-            entrada[0]++;
-            entrada[1] = 0;
-        }
-    } else if (entrada[0] == 2) {
-        if (entrada[1] < 3) {
-            entrada[1]++;
-        } else if (entrada[1] == 3) {
-            entrada[0] = 0;
-            entrada[1] = 0;
-        }
-    }
-    return;
-}
-
-void DisminuirMinuto(uint8_t entrada[6]) {
-    if (entrada[3] > 0) {
-        entrada[3]--;
-    } else if (entrada[3] == 0) {
-        if (entrada[2] > 0) {
-            entrada[2]--;
-        } else if (entrada[2] == 0) {
-            entrada[2] = 5;
-        }
-        entrada[3] = 9;
-    }
-    return;
-}
-
-void DisminuirHora(uint8_t entrada[6]) {
-    if (entrada[0] > 0) {
-        if (entrada[1] > 0) {
-            entrada[1]--;
-        } else if (entrada[1] == 0) {
-            entrada[0]--;
-            entrada[1] = 9;
-        }
-    } else if (entrada[0] == 0) {
-        if (entrada[1] > 0) {
-            entrada[1]--;
-        } else if (entrada[1] == 0) {
-            entrada[0] = 2;
-            entrada[1] = 3;
-        }
-    }
-    return;
 }
 
 /* === Public function implementation ========================================================= */
@@ -369,7 +264,6 @@ int main(void) {
             }
         }
 
-        // if (DigitalInputHasDesactivate(board->set_time)) {
         if ((!DigitalInputGetState(board->set_time))) {
             if (3 == tres_sec) {
                 if ((modo == MOSTRANDO_HORA) | (modo == SIN_CONFIGURAR)) {
@@ -412,16 +306,16 @@ void SysTick_Handler(void) {
 
     sist_contador = ((sist_contador + 1) % (TICK_POR_SEC));
 
-    GetHoraModo();
+    GetHoraModo(modo);
 
     DisplayWriteBCD(board->display, hora_obtenida, sizeof(hora_obtenida));
 
     if (sist_contador < TICK_POR_SEC / 2) {
-        PuntoModo();
+        PuntoModo(modo);
     }
 
     if ((!DigitalInputGetState(board->set_time)) | (!DigitalInputGetState(board->set_alarm))) {
-        if ((999 == sist_contador) && (tres_sec < 3)) {
+        if (((TICK_POR_SEC - 1) == sist_contador) && (tres_sec < 3)) {
             tres_sec++;
         }
         DisplayPunto(board->display, 2);
@@ -431,9 +325,9 @@ void SysTick_Handler(void) {
 
     if ((modo == ACTUAL_AJUSTANDO_MINUTOS) | (modo == ACTUAL_AJUSTANDO_HORAS) | (modo == ALARMA_AJUSTANDO_MINUTOS) |
         (modo == ALARMA_AJUSTANDO_HORAS)) {
-        if ((999 == sist_contador) && (treinta_sec < 10)) {
+        if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec < 10)) {
             treinta_sec++;
-        } else if ((999 == sist_contador) && (treinta_sec == 10)) {
+        } else if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec == 10)) {
             treinta_sec = 0;
             if (VERIFICAR_OBTENER_HORA) {
                 CambiarModo(MOSTRANDO_HORA);
