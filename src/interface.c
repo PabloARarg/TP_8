@@ -103,6 +103,46 @@ void DisminuirHora(uint8_t entrada[6]) {
     return;
 }
 
+void PuntoModo(placa_t board, clock_t reloj, modo_t modo) {
+    switch (modo) {
+    case SIN_CONFIGURAR:
+        DisplayPunto(board->display, 1);
+        break;
+    case MOSTRANDO_HORA:
+        DisplayPunto(board->display, 1);
+        if (AlarmaGetState(reloj)) {
+            DisplayPunto(board->display, 3);
+        }
+        if (AlarmaActivar(reloj)) {
+            DisplayPunto(board->display, 0);
+        }
+        break;
+    case ACTUAL_AJUSTANDO_MINUTOS:
+        DisplayPunto(board->display, 2);
+        DisplayPunto(board->display, 3);
+        break;
+    case ACTUAL_AJUSTANDO_HORAS:
+        DisplayPunto(board->display, 0);
+        DisplayPunto(board->display, 1);
+        break;
+    case ALARMA_AJUSTANDO_MINUTOS:
+
+        DisplayPunto(board->display, 0);
+        DisplayPunto(board->display, 1);
+        DisplayPunto(board->display, 2);
+        DisplayPunto(board->display, 3);
+        break;
+    case ALARMA_AJUSTANDO_HORAS:
+        DisplayPunto(board->display, 0);
+        DisplayPunto(board->display, 1);
+        DisplayPunto(board->display, 2);
+        DisplayPunto(board->display, 3);
+        break;
+    default:
+        break;
+    }
+}
+
 /* === End of documentation ==================================================================== */
 
 /** @} End of module definition for doxygen */

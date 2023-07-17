@@ -40,12 +40,6 @@ extern "C" {
 #endif
 
 /* === Public macros definitions =============================================================== */
-#define OBTENER_HORA ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define VERIFICAR_HORA ClockGetTimeState(reloj)
-#define DEFINIR_HORA ClockSetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define OBTENER_ALARMA ClockGetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define VERIFICAR_ALARMA AlarmaGetState(reloj)
-#define DEFINIR_ALARMA ClockSetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
 
 /* === Public data type declarations =========================================================== */
 typedef enum {
@@ -59,25 +53,43 @@ typedef enum {
 
 /* === Public variable declarations ============================================================ */
 
-static placa_t board;
-static modo_t modo;
-static clock_t reloj;
-static uint8_t hora_obtenida[6];
-static uint8_t tres_sec;
-static uint8_t treinta_sec;
-static uint16_t sist_contador;
-
 /* === Public function declarations ============================================================ */
-void CambiarModo(modo_t valor);
 
-void PuntoModo(modo_t modo);
+/**
+ * @brief Funcion que establece los puntos que se mostraran en el display
+ *
+ * @param board puntero que señala a la placa
+ * @param reloj puntero que señala al reloj
+ * @param modo modo en el cual se encuetra el reloj
+ */
+void PuntoModo(placa_t board, clock_t reloj, modo_t modo);
 
+/**
+ * @brief Funcino para aumentar un minuto
+ *
+ * @param entrada puntero al vector que tiene el valor actual (vector)
+ */
 void AumentarMinuto(uint8_t entrada[6]);
 
+/**
+ * @brief Funcino para aumentar una hora
+ *
+ * @param entrada puntero al vector que tiene el valor actual (vector)
+ */
 void AumentarHora(uint8_t entrada[6]);
 
+/**
+ * @brief Funcino para disminuir un minuto
+ *
+ * @param entrada puntero al vector que tiene el valor actual (vector)
+ */
 void DisminuirMinuto(uint8_t entrada[6]);
 
+/**
+ * @brief Funcino para aumentar una hora
+ *
+ * @param entrada puntero al vector que tiene el valor actual (vector)
+ */
 void DisminuirHora(uint8_t entrada[6]);
 
 /* === End of documentation ==================================================================== */
