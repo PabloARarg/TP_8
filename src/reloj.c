@@ -190,6 +190,11 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size) {
     return reloj->valida && aux;
 }
 
+//! Debuelve verdadero si la hora fue configurada
+bool ClockGetTimeState(clock_t reloj) {
+    return reloj->valida;
+}
+
 //! actualiza la hora si la cantidad de tick se alcanzaron
 void ActualizarHora(clock_t reloj) {
     uint8_t hora[6];

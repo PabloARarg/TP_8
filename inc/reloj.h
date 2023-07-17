@@ -77,7 +77,7 @@ clock_t ClockCreate(uint32_t ticks_por_segundos);
 bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size);
 
 /**
- * @brief Funcion que obteine la hora
+ * @brief Funcion que obtiene la hora
  *
  * @param reloj puntero que referencia al reloj
  * @param hora vector de 6 entero --> (puntero)
@@ -87,6 +87,15 @@ bool ClockSetTime(clock_t reloj, const uint8_t * hora, uint32_t size);
  * @note Copia el contenido del reloj campo->hora_actual en "hora"
  */
 bool ClockGetTime(clock_t reloj, uint8_t * hora, uint32_t size);
+
+/**
+ * @brief
+ *
+ * @param reloj puntero que referencia al reloj
+ * @return true si la hora fue configurada,
+ * @return false si no lo fue
+ */
+bool ClockGetTimeState(clock_t reloj);
 
 /**
  * @brief Actualiza la hora

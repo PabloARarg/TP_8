@@ -40,9 +40,11 @@ extern "C" {
 #endif
 
 /* === Public macros definitions =============================================================== */
-#define VERIFICAR_OBTENER_HORA ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define OBTENER_HORA ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define VERIFICAR_HORA ClockGetTimeState(reloj)
 #define DEFINIR_HORA ClockSetTime(reloj, hora_obtenida, sizeof(hora_obtenida))
-#define VERIFICAR_OBTENER_ALARMA ClockGetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define OBTENER_ALARMA ClockGetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
+#define VERIFICAR_ALARMA AlarmaGetState(reloj)
 #define DEFINIR_ALARMA ClockSetAlarm(reloj, hora_obtenida, sizeof(hora_obtenida))
 
 /* === Public data type declarations =========================================================== */
@@ -69,8 +71,6 @@ static uint16_t sist_contador;
 void CambiarModo(modo_t valor);
 
 void PuntoModo(modo_t modo);
-
-void GetHoraModo(modo_t modo);
 
 void AumentarMinuto(uint8_t entrada[6]);
 

@@ -62,6 +62,8 @@
 /* === Private variable definitions ============================================================ */
 
 /* === Private function implementation ========================================================= */
+
+//! funcion para cambiar el estado
 void CambiarModo(modo_t valor) {
     modo = valor;
     switch (modo) {
@@ -95,7 +97,7 @@ void PuntoModo(modo_t modo) {
         break;
     case MOSTRANDO_HORA:
         DisplayPunto(board->display, 1);
-        if (VERIFICAR_OBTENER_ALARMA) {
+        if (VERIFICAR_ALARMA) {
             DisplayPunto(board->display, 3);
         }
         if (AlarmaActivar(reloj)) {
@@ -122,31 +124,6 @@ void PuntoModo(modo_t modo) {
         DisplayPunto(board->display, 1);
         DisplayPunto(board->display, 2);
         DisplayPunto(board->display, 3);
-        break;
-    default:
-        break;
-    }
-}
-
-void GetHoraModo(modo_t modo) {
-    switch (modo) {
-    case SIN_CONFIGURAR:
-        ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
-        break;
-    case MOSTRANDO_HORA:
-        ClockGetTime(reloj, hora_obtenida, sizeof(hora_obtenida));
-        break;
-    case ACTUAL_AJUSTANDO_MINUTOS:
-
-        break;
-    case ACTUAL_AJUSTANDO_HORAS:
-
-        break;
-    case ALARMA_AJUSTANDO_MINUTOS:
-
-        break;
-    case ALARMA_AJUSTANDO_HORAS:
-
         break;
     default:
         break;
@@ -209,13 +186,14 @@ int main(void) {
     SisTick_Init(TICK_POR_SEC);
 
     while (true) {
+
         if (DigitalInputHasActivate(board->acept)) {
             treinta_sec = 0;
             if (modo == ACTUAL_AJUSTANDO_MINUTOS) {
                 CambiarModo(ACTUAL_AJUSTANDO_HORAS);
             } else if (modo == ACTUAL_AJUSTANDO_HORAS) {
                 DEFINIR_HORA;
-                if (VERIFICAR_OBTENER_HORA) {
+                if (VERIFICAR_HORA) {
                     CambiarModo(MOSTRANDO_HORA);
                 } else {
                     CambiarModo(SIN_CONFIGURAR);
@@ -228,33 +206,25 @@ int main(void) {
             } else if (modo == MOSTRANDO_HORA) {
                 if (AlarmaActivar(reloj)) {
                     AlarmaRest(reloj, TIME_OUT);
-                } else if (!VERIFICAR_OBTENER_ALARMA) {
+                } else if (!VERIFICAR_ALARMA) {
                     AlarmaOnOf(reloj, true);
                 }
             }
         }
 
         if (DigitalInputHasDesactivate(board->cancel)) {
-            if (modo == ACTUAL_AJUSTANDO_MINUTOS) {
-                if (VERIFICAR_OBTENER_HORA) {
+            if ((modo == ACTUAL_AJUSTANDO_MINUTOS) || (modo == ACTUAL_AJUSTANDO_HORAS)) {
+                if (VERIFICAR_HORA) {
                     CambiarModo(MOSTRANDO_HORA);
                 } else {
                     CambiarModo(SIN_CONFIGURAR);
                 }
-            } else if (modo == ACTUAL_AJUSTANDO_HORAS) {
-                if (VERIFICAR_OBTENER_HORA) {
-                    CambiarModo(MOSTRANDO_HORA);
-                } else {
-                    CambiarModo(SIN_CONFIGURAR);
-                }
-            } else if (modo == ALARMA_AJUSTANDO_MINUTOS) {
-                CambiarModo(MOSTRANDO_HORA);
-            } else if (modo == ALARMA_AJUSTANDO_HORAS) {
+            } else if ((modo == ALARMA_AJUSTANDO_MINUTOS) || (modo == ALARMA_AJUSTANDO_HORAS)) {
                 CambiarModo(MOSTRANDO_HORA);
             } else if (modo == MOSTRANDO_HORA) {
                 if (AlarmaActivar(reloj)) {
                     AlarmaPosponer(reloj);
-                } else if (VERIFICAR_OBTENER_ALARMA) {
+                } else if (VERIFICAR_ALARMA) {
                     AlarmaOnOf(reloj, false);
                 }
             }
@@ -262,8 +232,8 @@ int main(void) {
 
         if ((!DigitalInputGetState(board->set_time))) {
             if (3 == tres_sec) {
-                if ((modo == MOSTRANDO_HORA) | (modo == SIN_CONFIGURAR)) {
-                    VERIFICAR_OBTENER_HORA;
+                if ((modo == MOSTRANDO_HORA) || (modo == SIN_CONFIGURAR)) {
+                    OBTENER_HORA;
                     CambiarModo(ACTUAL_AJUSTANDO_MINUTOS);
                 }
             }
@@ -272,7 +242,7 @@ int main(void) {
         if ((!DigitalInputGetState(board->set_alarm))) {
             if (3 == tres_sec) {
                 if (modo == MOSTRANDO_HORA) {
-                    VERIFICAR_OBTENER_ALARMA;
+                    OBTENER_ALARMA;
                     CambiarModo(ALARMA_AJUSTANDO_MINUTOS);
                 }
             }
@@ -280,9 +250,9 @@ int main(void) {
 
         if (DigitalInputHasActivate(board->decrement)) {
             treinta_sec = 0;
-            if ((modo == ACTUAL_AJUSTANDO_MINUTOS) | (modo == ALARMA_AJUSTANDO_MINUTOS)) {
+            if ((modo == ACTUAL_AJUSTANDO_MINUTOS) || (modo == ALARMA_AJUSTANDO_MINUTOS)) {
                 AumentarMinuto(hora_obtenida);
-            } else if ((modo == ACTUAL_AJUSTANDO_HORAS) | (modo == ALARMA_AJUSTANDO_HORAS)) {
+            } else if ((modo == ACTUAL_AJUSTANDO_HORAS) || (modo == ALARMA_AJUSTANDO_HORAS)) {
                 AumentarHora(hora_obtenida);
             }
         }
@@ -299,33 +269,35 @@ int main(void) {
 }
 
 void SysTick_Handler(void) {
-
+    // aumenta en 1 la cantidad de tick o reinica
     sist_contador = ((sist_contador + 1) % (TICK_POR_SEC));
-
-    GetHoraModo(modo);
-
-    DisplayWriteBCD(board->display, hora_obtenida, sizeof(hora_obtenida));
-
+    // obtiene la hora actual y la pinta en pantalla
+    if (modo == SIN_CONFIGURAR || modo == MOSTRANDO_HORA) {
+        OBTENER_HORA;
+    }
+    DisplayWriteBCD(board->display, hora_obtenida,
+                    sizeof(hora_obtenida)); // llena los bits necesarios para completar los digitos
+    // en funcion del modo pintal los puntos
     if (sist_contador < TICK_POR_SEC / 2) {
         PuntoModo(modo);
     }
-
+    // cuentra 3 segundos para los botonoes set_time y set_alarma
     if ((!DigitalInputGetState(board->set_time)) | (!DigitalInputGetState(board->set_alarm))) {
-        if (((TICK_POR_SEC - 1) == sist_contador) && (tres_sec < 3)) {
+        if (((TICK_POR_SEC - 1) == sist_contador) && (tres_sec < T_PULSADO)) {
             tres_sec++;
         }
         DisplayPunto(board->display, 2);
     } else {
         tres_sec = 0;
     }
-
+    // cuenta 30 segundos para salir de cualquier estado de set
     if ((modo == ACTUAL_AJUSTANDO_MINUTOS) | (modo == ACTUAL_AJUSTANDO_HORAS) | (modo == ALARMA_AJUSTANDO_MINUTOS) |
         (modo == ALARMA_AJUSTANDO_HORAS)) {
-        if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec < 10)) {
+        if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec < T_ESPERADO)) {
             treinta_sec++;
-        } else if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec == 10)) {
+        } else if (((TICK_POR_SEC - 1) == sist_contador) && (treinta_sec == T_ESPERADO)) {
             treinta_sec = 0;
-            if (VERIFICAR_OBTENER_HORA) {
+            if (VERIFICAR_HORA) {
                 CambiarModo(MOSTRANDO_HORA);
             } else {
                 CambiarModo(SIN_CONFIGURAR);

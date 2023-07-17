@@ -67,6 +67,14 @@ extern "C" {
 //! Define la cantidad de minutos que se pospone la alarma
 #define TIME_OUT 5
 
+//! Tiempo que  debe pulsar cualquier pulsador de set para ingresar a la funcion
+//--> por defercto 3
+#define T_PULSADO 3
+
+//! Tiempo que se espera para pulsar alguna tecla para no volver al estado por defecto
+//--> por defercto 30
+#define T_ESPERADO 10
+
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus
