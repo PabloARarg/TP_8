@@ -36,6 +36,7 @@
 
 /* === Headers files inclusions =============================================================== */
 
+#include "FreeRTOS.h"
 #include "bcp.h"
 #include "chip.h"
 #include "define.h"
@@ -43,6 +44,7 @@
 #include "interface.h"
 #include "pantalla.h"
 #include "reloj.h"
+#include "task.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -73,6 +75,9 @@ void CambiarModo(modo_t valor);
 void Verificar30Sec(void);
 void VerificarTresSec(void);
 void SegmentosYPuntosCorrectos(void);
+void Teclas(void);
+void ST_Handler(void);
+void Pantalla(void);
 
 /* === Public variable definitions ============================================================= */
 
@@ -147,22 +152,10 @@ void SegmentosYPuntosCorrectos(void) {
     }
     return;
 }
-/* === Public function implementation ========================================================= */
-int main(void) {
-    board = BoardCreate();
 
-    reloj = ClockCreate(TICK_POR_SEC_TEST);
-
-    sist_contador = 0;
-    tres_sec = 0;
-    treinta_sec = 0;
-
-    CambiarModo(SIN_CONFIGURAR);
-
-    SisTick_Init(TICK_POR_SEC);
+void Teclas(void) {
 
     while (true) {
-
         if (DigitalInputHasActivate(board->acept)) {
             treinta_sec = 0;
             if (modo == ACTUAL_AJUSTANDO_MINUTOS) {
@@ -241,10 +234,36 @@ int main(void) {
                 DisminuirHora(hora_obtenida);
             }
         }
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    vTaskDelete(NULL);
+}
+/* === Public function implementation ========================================================= */
+int main(void) {
+    board = BoardCreate();
+
+    reloj = ClockCreate(TICK_POR_SEC_TEST);
+
+    sist_contador = 0;
+    tres_sec = 0;
+    treinta_sec = 0;
+
+    CambiarModo(SIN_CONFIGURAR);
+
+    SisTick_Init(TICK_POR_SEC);
+
+    xTaskCreate(ST_Handler, "Timer", 256, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(Teclas, "Teclas", 256, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(Pantalla, "Pantalla", 256, NULL, tskIDLE_PRIORITY + 3, NULL);
+    //  Teclas();
+
+    vTaskStartScheduler();
+
+    while (true) {
     }
 }
 
-void SysTick_Handler(void) {
+/* void SysTick_Handler(void) {
     // aumenta en 1 la cantidad de tick o reinica
     sist_contador = ((sist_contador + 1) % (TICK_POR_SEC));
     // obtiene la hora actual para colocar los digitos y puntos correctos
@@ -258,6 +277,35 @@ void SysTick_Handler(void) {
     // aumenta el en 1 la cuenta y actualiza el reloj interno
     AumentarTick(reloj);
     ActualizarHora(reloj);
+} */
+
+void ST_Handler(void) {
+    TickType_t last_value = xTaskGetTickCount();
+
+    while (true) {
+        // aumenta en 1 la cantidad de tick o reinica
+        sist_contador = ((sist_contador + 1) % (TICK_POR_SEC));
+        // aumenta el en 1 la cuenta y actualiza el reloj interno
+        AumentarTick(reloj);
+        ActualizarHora(reloj);
+        xTaskDelayUntil(&last_value, pdMS_TO_TICKS(1));
+    }
+    vTaskDelete(NULL);
+}
+
+void Pantalla(void) {
+    while (true) {
+        //  obtiene la hora actual para colocar los digitos y puntos correctos
+        SegmentosYPuntosCorrectos();
+        // cuenta 3 segundos para los botonoes set_time y set_alarma
+        VerificarTresSec();
+        // cuenta 30 segundos para salir de cualquier estado de set
+        Verificar30Sec();
+        // pinta la pantalla
+        DisplayRefresh(board->display);
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    vTaskDelete(NULL);
 }
 
 /* === End of documentation ==================================================================== */
